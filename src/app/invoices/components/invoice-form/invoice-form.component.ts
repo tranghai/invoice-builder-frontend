@@ -14,6 +14,7 @@ export class InvoiceFormComponent implements OnInit {
 
   private invoice: Invoice;
   invoiceForm: FormGroup;
+  title_form: string;
 
   constructor(
     private fb: FormBuilder,
@@ -45,8 +46,10 @@ export class InvoiceFormComponent implements OnInit {
       .subscribe(params => {
         let id = params['id'];
         if (!id) {
+          this.title_form = "Create Invoice";
           return;
         }
+        this.title_form = "Update Invoice";
         this.invoiceService.getInvoice(id)
           .subscribe(invoice => {
             this.invoice = invoice;

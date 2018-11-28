@@ -35,16 +35,16 @@
     </ng-container>
 
     <ng-container matColumnDef="qty">
-      <mat-header-cell *matHeaderCellDef  mat-sort-header> Qty </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Qty </mat-header-cell>
       <mat-cell *matCellDef="let invoice"> {{invoice.qty}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="rate">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> Rate </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Rate </mat-header-cell>
       <mat-cell *matCellDef="let invoice"> {{invoice.rate}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="tax">
-      <mat-header-cell *matHeaderCellDef mat-sort-header> Tax </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Tax </mat-header-cell>
       <mat-cell *matCellDef="let invoice"> {{invoice.tax}} </mat-cell>
     </ng-container>
 
@@ -70,8 +70,6 @@
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
   </mat-table>
-
-  <mat-paginator #paginator [length]="resultsLength" [showFirstLastButtons]="true" [pageSize]="5" [pageSizeOptions]="[5, 10, 20]">
+  <mat-paginator #paginator [length]="resultsLength" [showFirstLastButtons]="true" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]">
   </mat-paginator>
-
 </div>

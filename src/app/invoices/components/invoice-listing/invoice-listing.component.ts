@@ -39,8 +39,8 @@ export class InvoiceListingComponent
   ) {}
 
   displayedColumns = ["item", "date", "due", "qty", "rate", "tax", "action"];
-  //dataSource = new MatTableDataSource<Invoice>();
-  dataSource: Invoice[] = [];
+  dataSource = new MatTableDataSource<Invoice>();
+  //dataSource: Invoice[] = [];
   resultsLength = 0;
   isResultsLoading = false;
 
@@ -56,11 +56,11 @@ export class InvoiceListingComponent
   deleteBtnHandler(id) {
     this.invocieService.deleteInvoice(id).subscribe(
       data => {
-        const removedItems = remove(this.dataSource, item => {
+        const removedItems = remove(this.dataSource.data, item => {
           return item._id === data._id;
         });
 
-        this.dataSource = [...this.dataSource];
+        this.dataSource.data = [...this.dataSource.data];
         this.snackBar.open("Invoice deleted", "Success", {
           duration: 2000
         });
@@ -70,35 +70,14 @@ export class InvoiceListingComponent
   }
 
   ngOnInit() {
-    // this.paginator.page.subscribe(
-    //   data => {
-    //     this.invocieService
-    //       .getInvoices({ page: ++data.pageIndex, perPage: data.pageSize })
-    //       .subscribe(data => {
-    //         this.dataSource = data.docs;
-    //         this.resultsLength = data.total;
-    //       });
-    //   },
-    //   err => this.errorHandler(err, 'Failed to fetch invoices'));
-
-    this.isResultsLoading = true;
-    this.paginator.page.flatMap(data =>{
-      return this.invocieService.getInvoices({ page: ++data.pageIndex, perPage: data.pageSize })
-    }).subscribe(data => {
-      this.dataSource = data.docs;
-      this.resultsLength = data.total;
-      this.isResultsLoading = false;
-    },err => this.errorHandler(err, 'Failed to fetch invoices'));
-
-    this.populateInvoices();
   }
 
   private populateInvoices() {
     this.isResultsLoading = true;
-    this.invocieService.getInvoices({ page: 1, perPage: 10 }).subscribe(
+    this.invocieService.getInvoices({ page: 1, perPage: 10, sortField: null, sortDir: null, filter: null }).subscribe(
       data => {
-        this.dataSource = data["docs"];
-        this.resultsLength = this.dataSource.length;
+        this.dataSource.data = data.docs;
+        this.resultsLength = data.total;
       },
       err => this.errorHandler(err, 'Failed to fetch invoices'),
       () =>{
@@ -107,21 +86,21 @@ export class InvoiceListingComponent
   }
 
   filterText(filterValue: string) {
-    // this.isResultsLoading = true; 
-    // filterValue = filterValue.trim()
-    // this.paginator.pageIndex = 0;
-    // this.invocieService.getInvoices({
-    //   page: this.paginator.pageIndex,
-    //   perPage: this.paginator.pageSize,
-    //   sortField: this.sort.active,
-    //   sortDir: this.sort.direction,
-    //   filter: filterValue
-    // })
-    //   .subscribe(data => {
-    //     this.dataSource.data = data.docs;
-    //     this.resultsLength = data.total;
-    //     this.isResultsLoading = false;
-    //   }, err => this.errorHandler(err, 'Failed to filter invoices'))
+    this.isResultsLoading = true; 
+    filterValue = filterValue.trim()
+    this.paginator.pageIndex = 0;
+    this.invocieService.getInvoices({
+      page: this.paginator.pageIndex,
+      perPage: this.paginator.pageSize,
+      sortField: this.sort.active,
+      sortDir: this.sort.direction,
+      filter: filterValue
+    })
+      .subscribe(data => {
+        this.dataSource.data = data.docs;
+        this.resultsLength = data.total;
+        this.isResultsLoading = false;
+      }, err => this.errorHandler(err, 'Failed to filter invoices'))
   }
 
   ngAfterViewChecked() {
@@ -129,36 +108,36 @@ export class InvoiceListingComponent
     //Add 'implements AfterViewChecked' to the class.
     this.ref.detectChanges();
   }
+
   ngAfterViewInit() {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    // this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0)
-    // merge(this.paginator.page, this.sort.sortChange)
-    //   .pipe(
-    //     startWith({}),
-    //     switchMap(() => {
-    //       this.isResultsLoading = true;
-    //       return this.invocieService.getInvoices({
-    //         page: this.paginator.pageIndex,
-    //         perPage: this.paginator.pageSize,
-    //         sortField: this.sort.active,
-    //         sortDir: this.sort.direction,
-    //         filter: ''
-    //       })
-    //     }),
-    //     map(data => {
-    //       this.isResultsLoading = false;
-    //       this.resultsLength = data.total;
-    //       return data.docs;
-    //     }),
-    //     catchError(() => {
-    //       this.isResultsLoading = false;
-    //       this.errorHandler('Failed to fetch invoices', 'Error');
-    //       return observableOf([])
-    //     })
-    //   )
-    //   .subscribe(data => {
-    //     this.dataSource.data = data;
-    //   })
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0)
+      merge(this.paginator.page, this.sort.sortChange)
+      .pipe(
+        startWith({}),
+        switchMap(() => {
+          this.isResultsLoading = true;
+          return this.invocieService.getInvoices({
+            page: this.paginator.page,
+            perPage: this.paginator.pageSize,
+            sortField: this.sort.active,
+            sortDir: this.sort.direction,
+            filter: ''
+          })
+        }),
+        map(data =>{
+          this.isResultsLoading = false;
+          this.resultsLength = data.total;
+          return data.docs;
+        }),
+        catchError(() =>{
+          this.isResultsLoading = false;
+          this.errorHandler('Failed to fetch invoices', 'Error');
+          return observableOf([]);
+        }))
+        .subscribe(data =>{
+          this.dataSource.data = data;
+        });
   }
 
   private errorHandler(error, message) {

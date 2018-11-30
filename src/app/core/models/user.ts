@@ -12,3 +12,6 @@ export class User {
     success: boolean;
     message: string;
   }
+  export interface LogoutRsp {
+    success: true;
+  }

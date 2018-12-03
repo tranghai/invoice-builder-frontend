@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { JwtService } from '../core';
 
 @Component({
   selector: 'app-invoice-builder',
@@ -7,9 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor() { }
+  constructor(private jwtService: JwtService) { }
 
   ngOnInit() {
+    console.log(this.jwtService.getToken());
   }
 
 }

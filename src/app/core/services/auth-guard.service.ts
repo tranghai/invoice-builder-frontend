@@ -1,21 +1,63 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, CanActivateChild } from '@angular/router';
-import { JwtService } from './jwt.service';
+import { Injectable } from "@angular/core";
+import {
+  CanActivate,
+  Router,
+  CanActivateChild,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot
+} from "@angular/router";
+import { JwtService } from "./jwt.service";
+import { Observable } from "rxjs";
+import { map, catchError } from "rxjs/operators";
+import { AuthService } from "./auth.service";
 
 @Injectable()
-export class AuthGuardService implements CanActivate, CanActivateChild{
-    constructor(private jwtService: JwtService, private router: Router){}
+export class AuthGuardService implements CanActivate, CanActivateChild {
+  constructor(
+    private jwtService: JwtService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-    canActivate(): boolean{
-        if(this.jwtService.getToken()){
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    if (this.jwtService.getToken()) {
+      return Observable.of(true);
+    }
+
+    //extract the token
+    //authentication from the backend by using token
+    //if anthenticated the we need to save the token to localStorage
+    //navigate to dashboard/invoices router
+    const token = route.queryParamMap.get("token");
+
+    if (token) {
+      return this.authService.isAuthenticated(token).pipe(
+        map(authenticated => {
+          if (authenticated === true) {
+            this.jwtService.setToken(token);
+            this.router.navigate(["/dashboard", "invoices"]);
             return true;
-        }else{
-            this.router.navigate(['/login']);
-            return false;
-        }
+          }
+          this.router.navigate(["/login"]);
+          return false;
+        }),
+        catchError((err: any) =>{
+          this.router.navigate(["/login"]);
+          return Observable.of(false);
+        })
+      );
     }
+    // authentica
+    else {
+      this.router.navigate(["/login"]);
+      return Observable.of(false);
+    }
+  }
 
-    canActivateChild(): boolean{
-        return this.canActivate();
-    }
+  canActivateChild(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+    return this.canActivate(route, state);
+  }
 }

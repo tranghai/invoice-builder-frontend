@@ -19,15 +19,15 @@ export class AuthGuardService implements CanActivate, CanActivateChild {
     private authService: AuthService
   ) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     if (this.jwtService.getToken()) {
       return Observable.of(true);
     }
 
     //extract the token
+    //authentication from the backend by using token
+    //if anthenticated the we need to save the token to localStorage
+    //navigate to dashboard/invoices router
     const token = route.queryParamMap.get("token");
 
     if (token) {
@@ -38,9 +38,12 @@ export class AuthGuardService implements CanActivate, CanActivateChild {
             this.router.navigate(["/dashboard", "invoices"]);
             return true;
           }
-
           this.router.navigate(["/login"]);
           return false;
+        }),
+        catchError((err: any) =>{
+          this.router.navigate(["/login"]);
+          return Observable.of(false);
         })
       );
     }

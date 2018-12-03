@@ -19,7 +19,6 @@ export class TokenInterceptorService  implements HttpInterceptor{
         }
 
         const _req = req.clone({ setHeaders: headersConfig });
-
         return next.handle(_req);
     }
 }

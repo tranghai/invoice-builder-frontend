@@ -24,7 +24,8 @@ export class InvoiceListingComponent implements OnInit, AfterViewInit, AfterView
     private router: Router,
     private snackBar: MatSnackBar,
     private ref: ChangeDetectorRef) { }
-  displayedColumns = ['item', 'date', 'due', 'qty', 'rate', 'tax', 'action'];
+  // displayedColumns = ['item', 'date', 'due', 'qty', 'rate', 'tax', 'action'];
+  displayedColumns = ['item', 'date', 'due', 'action'];
   dataSource = new MatTableDataSource<Invoice>();
   resultsLength = 0;
   isResultsLoading = false;

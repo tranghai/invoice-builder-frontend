@@ -15,6 +15,8 @@ export class AuthComponent implements OnInit {
   authForm: FormGroup;
   title = '';
   isResultsLoading = false;
+  hide = true;
+  
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -64,6 +66,11 @@ export class AuthComponent implements OnInit {
       );
     }
   }
+
+  forgotPassHandler(){
+    this.router.navigate(['/forgot-password']);
+  }
+
   private initForm() {
     this.authForm = this.fb.group({
       email: ['', Validators.required],
@@ -71,6 +78,7 @@ export class AuthComponent implements OnInit {
       name: ''
     });
   }
+  
   private errorHandler(error, message) {
     this.isResultsLoading = false;
     console.error(error);

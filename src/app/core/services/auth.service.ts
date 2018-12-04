@@ -39,4 +39,19 @@ export class AuthService {
   logOut(): Observable<LogoutRsp> {
     return this.httpClient.get<LogoutRsp>(`${environment.api_url}/auth/logout`);
   }
+
+  forgotPassword(data: {email: string}) : Observable<{message: string}> {
+    return this.httpClient.post<{message: string}>(`${environment.api_url}/users/forgot-password`,data);
+  }
+  resetPassword(body) : Observable<{success: boolean}>{
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type' :'application/json',
+        'Authorization': `bearer ${body.token}`
+      })
+    }
+    return this.httpClient.put<{success: boolean}>(`${environment.api_url}/users/reset-password`,
+    {password: body.password},
+    httpOptions)
+  }
 }
